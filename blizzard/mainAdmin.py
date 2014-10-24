@@ -17,7 +17,7 @@ allIMEIs = [352308061274784, 353323057881210, 353323057976994, 353323057837303, 
 #allIMEIs = [353323058147710,353323058163469]
 
 #print("starting charge start vs soc")
-#plotChargeStartVsSOC(dbc,allIMEIs,9,1,14,10,22,14)
+plotChargeStartVsSOC(dbc,allIMEIs,9,1,14,10,22,14)
 
 #print("starting distance vs day")
 #plotDistanceVsDayAGGREGATE(dbc,allIMEIs,9,1,14,52)
