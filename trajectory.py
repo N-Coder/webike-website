@@ -1,9 +1,7 @@
 #!/usr/bin/env python
-from databaseConnector import *
 from datetime import datetime
+
 from compute import haversine
-from tripDetection import TripDetection
-import matplotlib.pyplot as plt
 
 
 # Calculate Haversine distance between subsequent points
@@ -15,12 +13,13 @@ def haversineDistance(lon, lat):  # pass the lists with coordinates (longitude a
 
 
 # Add points to the connected components (on both sides), it stops when it finds a local maxima
-def increaseCC(cc, maxi, mini, distances):  # pass: list of connected components lists, list of maxima, list of minima, list of distances
-    for i in range(0, len(cc)-1):
+def increaseCC(cc, maxi, mini,
+               distances):  # pass: list of connected components lists, list of maxima, list of minima, list of distances
+    for i in range(0, len(cc) - 1):
         if i == 0:
-            while cc[i][2] not in maxi and cc[i][2] < cc[i+1][0]:
+            while cc[i][2] not in maxi and cc[i][2] < cc[i + 1][0]:
                 if cc[i][0] > 0 and cc[i][2] < len(distances) - 1:  # Excluding the first and last indexes
-                    if(distances[cc[i][0] - 1] > distances[cc[i][2] + 1]):
+                    if (distances[cc[i][0] - 1] > distances[cc[i][2] + 1]):
                         cc[i][0] -= 1
                     else:
                         cc[i][2] += 1
@@ -28,10 +27,11 @@ def increaseCC(cc, maxi, mini, distances):  # pass: list of connected components
                     cc[i][2] += 1
                 elif cc[i][2] == len(distances) - 1:
                     cc[i][0] -= 1
-        elif i > 0 and i < len(cc)-1:
-            while (cc[i][0] not in maxi) and (cc[i][2] not in maxi) and cc[i][2] < cc[i+1][0] and cc[i][0] > cc[i-1][2]:
+        elif i > 0 and i < len(cc) - 1:
+            while (cc[i][0] not in maxi) and (cc[i][2] not in maxi) and cc[i][2] < cc[i + 1][0] and cc[i][0] > \
+                    cc[i - 1][2]:
                 if cc[i][0] > 0 and cc[i][2] < len(distances) - 1:  # Excluding the fist and last indexes
-                    if(distances[cc[i][0] - 1] > distances[cc[i][2] + 1]):
+                    if (distances[cc[i][0] - 1] > distances[cc[i][2] + 1]):
                         cc[i][0] -= 1
                     else:
                         cc[i][2] += 1
@@ -39,38 +39,39 @@ def increaseCC(cc, maxi, mini, distances):  # pass: list of connected components
                     cc[i][2] += 1
                 elif cc[i][2] == len(distances) - 1:
                     cc[i][0] -= 1
-    while (cc[len(cc)-1][0] not in maxi) and cc[len(cc)-1][0] != cc[len(cc)-2][2]:
-        cc[len(cc)-1][0] -= 1
+    while (cc[len(cc) - 1][0] not in maxi) and cc[len(cc) - 1][0] != cc[len(cc) - 2][2]:
+        cc[len(cc) - 1][0] -= 1
     return cc
+
 
 # Joins connected components when they share a local maxima and also returns the bars (ranges) identified
 def joinCC(cc, distances):
     barTemp = []
     keep = []
-    copycc = cc[:] #making a copy of cc to record all the changes
-    joined = [] # keeping track of the joined cc
+    copycc = cc[:]  # making a copy of cc to record all the changes
+    joined = []  # keeping track of the joined cc
     for i in range(len(cc) - 1):
         if cc[i][2] == cc[i + 1][0] and i not in joined:
             if distances[cc[i][1]] > distances[cc[i + 1][1]]:
                 barTemp.append(cc[i])  # append the non-surviving cc to the list of bars
                 copycc[i + 1][0] = cc[i][0]  # change value of the last point of the cc that remains
-                if (i+1) not in keep:
+                if (i + 1) not in keep:
                     keep.append(i + 1)  # saving the one that should stay-contrary to the one that should be deleted
                 joined.append(i)
-                joined.append(i+1)
+                joined.append(i + 1)
             else:
-                barTemp.append(cc[i+1])  # append the non-surviving cc to the list of bars
+                barTemp.append(cc[i + 1])  # append the non-surviving cc to the list of bars
                 copycc[i][2] = cc[i + 1][2]  # change value of the first point of the cc that remains
                 if i not in keep:
-                    keep.append(i) # saving the one that should stay-contrary to the one that should be deleted
+                    keep.append(i)  # saving the one that should stay-contrary to the one that should be deleted
                 joined.append(i)
-                joined.append(i+1)
+                joined.append(i + 1)
         elif i not in joined:
             # it is giving them two chances to survive and it is eliminating the last one automatically if it does not win
             if i not in keep:
                 keep.append(i)
-    if len(cc)-1 not in joined:
-        keep.append(len(cc)-1)
+    if len(cc) - 1 not in joined:
+        keep.append(len(cc) - 1)
     newCC = [copycc[i] for i in keep]
     return barTemp, newCC  # return the identified bars and the list of new connectec components
 
@@ -83,7 +84,9 @@ def gpsSimplification(lon, lat, stamps, beta):
     for i in range(2, len(distances) - 1):
         if distances[i - 1] < distances[i] > distances[i + 1]:
             maxi.append(i)
-        elif (distances[i - 1] > distances[i] < distances[i + 1]) or (distances[i - 1] == distances[i] < distances[i + 1]) or (distances[i - 1] > distances[i] == distances[i + 1]):
+        elif (distances[i - 1] > distances[i] < distances[i + 1]) or (
+                        distances[i - 1] == distances[i] < distances[i + 1]) or (
+                        distances[i - 1] > distances[i] == distances[i + 1]):
             mini.append(i)
     bar = []  # list of bars detected
     cc = []  # list of connected components
@@ -91,27 +94,27 @@ def gpsSimplification(lon, lat, stamps, beta):
         cc.append([i, i, i])
 
     # while there is more than one connected component keep joining component together
-    while(len(cc) > 1):
+    while (len(cc) > 1):
         cc = increaseCC(cc, maxi, mini, distances)
         barTemporary, cc = joinCC(cc, distances)
         bar.extend(barTemporary)
     # beta simplification
     newBar = []
     for i in range(len(bar)):
-        if(abs(distances[bar[i][0]] - distances[bar[i][2]]) > beta):
+        if (abs(distances[bar[i][0]] - distances[bar[i][2]]) > beta):
             newBar.append(bar[i])
 
     # extracting all values from list // values is a list with other lists inside
     valuesTemp = []
     for i in newBar:
         for j in i:
-            if(j not in valuesTemp):
+            if (j not in valuesTemp):
                 valuesTemp.append(j)
 
     # deleting equal values
     valuesTemp2 = []
     for i in range(1, len(valuesTemp)):
-        if distances[valuesTemp[i]] != distances[valuesTemp[i-1]]:
+        if distances[valuesTemp[i]] != distances[valuesTemp[i - 1]]:
             valuesTemp2.append(valuesTemp[i])
 
     # copying only remaining points
@@ -139,16 +142,19 @@ def gpsSimplification(lon, lat, stamps, beta):
         newLat.append(lat[xplottable[i] + 1])
         newLon.append(lon[xplottable[i] + 1])
         newStamp.append(stamps[xplottable[i] + 1])
-    if(lon[-1] not in newLon):
+    if (lon[-1] not in newLon):
         newLon.append(lon[-1])
         newLat.append(lat[-1])
         newStamp.append(stamps[-1])
     return newLon, newLat, newStamp
+
+
 def totalDistance(dist):
     d = 0.0
     for i in range(len(dist)):
-        d+=dist[i]
+        d += dist[i]
     return d
+
 
 def trajectoryClean(dbc, imei, beta, syear, smonth, sday):
     curDate = datetime(syear, smonth, sday, 0, 0, 0)
@@ -158,7 +164,8 @@ def trajectoryClean(dbc, imei, beta, syear, smonth, sday):
     ids = []
     isAccurateList = []
     comments = []
-    query = "select start_time, end_time, id, isAccurate, comments from trip{0} where start_time >= \"{1}\" and start_time <= \"{2}\"".format(imei, curDate, endDate)
+    query = "select start_time, end_time, id, isAccurate, comments from trip{0} where start_time >= \"{1}\" and start_time <= \"{2}\"".format(
+        imei, curDate, endDate)
     for record in dbc.SQLSelectGenerator(query):
         tripStartTimes.append(record[0])
         tripEndTimes.append(record[1])
@@ -168,7 +175,9 @@ def trajectoryClean(dbc, imei, beta, syear, smonth, sday):
             comments.append(record[4])
         else:
             comments.append("")
-    newLon, newLat, startStr, endStr, dist, totalTime, stampsStr = get_trajectory_information(dbc, imei, beta, tripStartTimes, tripEndTimes)
+    newLon, newLat, startStr, endStr, dist, totalTime, stampsStr = get_trajectory_information(dbc, imei, beta,
+                                                                                              tripStartTimes,
+                                                                                              tripEndTimes)
     return newLon, newLat, startStr, endStr, dist, totalTime, stampsStr, ids, isAccurateList, comments
 
 
@@ -185,7 +194,8 @@ def get_trajectory_information(dbc, imei, beta, tripStartTimes, tripEndTimes):
             tempLon = []
             tempLat = []
             tempStamp = []
-            stmt = "select stamp, LatGPS, LongGPS from imei{0} where stamp >= \"{1}\" and stamp <= \"{2}\" and latgps is not null and longgps is not null and latgps!= 0 and longgps!=0 order by stamp;".format(imei, tripStartTimes[tripNumber], tripEndTimes[tripNumber])
+            stmt = "select stamp, LatGPS, LongGPS from imei{0} where stamp >= \"{1}\" and stamp <= \"{2}\" and latgps is not null and longgps is not null and latgps!= 0 and longgps!=0 order by stamp;".format(
+                imei, tripStartTimes[tripNumber], tripEndTimes[tripNumber])
             for l in dbc.SQLSelectGenerator(stmt):
                 stamps.append(l[0])
                 lat.append(l[1])

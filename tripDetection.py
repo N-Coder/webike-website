@@ -1,13 +1,16 @@
 from math import pow, sqrt
-from parameter import Parameter
-from Data import Data
+
 import trajectory
+from Data import Data
+from parameter import Parameter
+
 
 def calculate_module(data):
     sq_sum = 0
     for i in data:
         sq_sum += pow(i, 2)
     return sqrt(sq_sum)
+
 
 class TripDetection:
     def __init__(self):
@@ -16,13 +19,14 @@ class TripDetection:
         self.gyro_limit = 0.15
         self.min_number_of_values_over_limit = 25
         self.array_length = 90
-        self.min_trip_length = 300 #s
+        self.min_trip_length = 300  # s
         self.trip_started = False
-        self.max_time_between_movement = 280 #s
-        self.max_avg_speed = 30 #km/h
+        self.max_time_between_movement = 280  # s
+        self.max_avg_speed = 30  # km/h
 
         # Declaring variables
-        self.charging_currents = Parameter(self.array_length, self.charging_current_limit, self.min_number_of_values_over_limit)
+        self.charging_currents = Parameter(self.array_length, self.charging_current_limit,
+                                           self.min_number_of_values_over_limit)
         self.gyroscopes = Parameter(self.array_length, self.gyro_limit, self.min_number_of_values_over_limit)
         self.start_times = []
         self.end_times = []
@@ -41,7 +45,9 @@ class TripDetection:
 
     def detect_trips(self, dbc, imei, start_date, end_date):
         # Obtaining all the data from the DB
-        query = "select * from imei{0} where stamp >= \"{1}\" and stamp <= \"{2}\" order by stamp".format(imei, start_date, end_date)
+        query = "select * from imei{0} where stamp >= \"{1}\" and stamp <= \"{2}\" order by stamp".format(imei,
+                                                                                                          start_date,
+                                                                                                          end_date)
         for record in dbc.SQLSelectGenerator(query):
             # Setting the data required for the algorithm
             if record[self.charging_current_db] is not None:
@@ -63,14 +69,14 @@ class TripDetection:
             else:
                 if self.charging_currents.max_limit_reached() or not self.gyroscopes.max_limit_reached():
                     self.end_trip(record[self.time_db])
-        self.validate_all_trips(dbc,imei)
+        self.validate_all_trips(dbc, imei)
         return self.start_times, self.end_times
 
     def validate_all_trips(self, dbc, imei):
         beta = 0.06
         for i, j in zip(self.start_times, self.end_times):
-            time = (j - i).total_seconds()/3600
-            _, _, _, _,distance, _, _ = trajectory.get_trajectory_information(dbc, imei, beta, [i], [j])
+            time = (j - i).total_seconds() / 3600
+            _, _, _, _, distance, _, _ = trajectory.get_trajectory_information(dbc, imei, beta, [i], [j])
             if distance:
                 speed = distance[0] / time
                 if speed > self.max_avg_speed:

@@ -1,6 +1,5 @@
 import builtins
 import hashlib
-import json
 
 from flask import Flask, request, Response, flash, redirect, url_for
 from flask import g
@@ -34,6 +33,7 @@ USERS = dict()
 
 login_manager.setup_app(app)
 
+
 @app.before_request
 def db_connect():
     g.dbc = databaseConnector(app)
@@ -52,6 +52,7 @@ def load_user(userid):
         if checkDB(uoldname, uoldpass):
             return USERS[userid]
     return None
+
 
 from sys import stderr
 
@@ -92,15 +93,17 @@ def login():
     else:
         return render_template("auth.html", fail="false")
 
+
 @app.context_processor
 def inject_globals():
     return dict(
         # Looks up where assets (js, css) files are stored in system
         # blizzard is under ~/public_html
-        assets_path = app.config['ASSETS_PATH'],
+        assets_path=app.config['ASSETS_PATH'],
         # Ajax requests are routed under /webike on blizzard
-        url_ext = app.config['AJAX_URL_EXT']
+        url_ext=app.config['AJAX_URL_EXT']
     )
+
 
 @app.route("/logout")
 @login_required
@@ -114,21 +117,26 @@ def logout():
 def analyzer():
     return render_template('index.html', i=current_user.imei, name=current_user.name)
 
+
 ##### New Dashboard #####
 @app.route('/dashboard', methods=['GET'])
 @login_required
 def dashboard():
     return render_template('dashboard/distance.html')
 
+
 @app.route('/dashboard/trips', methods=['GET'])
 @login_required
 def trips():
     return render_template('dashboard/trips.html')
 
+
 @app.route('/dashboard/soc', methods=['GET'])
 @login_required
 def soc():
     return render_template('dashboard/soc.html')
+
+
 ##### end of New Dashboard #####
 
 ##### AJAX calls - Old Website #####
@@ -163,7 +171,8 @@ def dpd():
     imei = request.args.get('imei')
     dt = request.args.get('s').split("/")
     numdays = int(request.args.get('nd'))
-    ret = plotDistanceVsDay(g.dbc, imei, int(dt[0].replace("\"", "")), int(dt[1]), int(dt[2].replace("\"", "")), numdays)
+    ret = plotDistanceVsDay(g.dbc, imei, int(dt[0].replace("\"", "")), int(dt[1]), int(dt[2].replace("\"", "")),
+                            numdays)
     print_err(ret)
     resp = Response(response=ret,
                     status=200,
@@ -177,7 +186,8 @@ def tld():
     imei = request.args.get('imei')
     dt = request.args.get('s').split("/")
     numdays = int(request.args.get('nd'))
-    ret = plotTripLengthDistribution(g.dbc, imei, int(dt[0].replace("\"", "")), int(dt[1]), int(dt[2].replace("\"", "")), numdays)
+    ret = plotTripLengthDistribution(g.dbc, imei, int(dt[0].replace("\"", "")), int(dt[1]),
+                                     int(dt[2].replace("\"", "")), numdays)
     resp = Response(response=ret,
                     status=200,
                     mimetype="image/png")
@@ -203,8 +213,13 @@ def googemapscoords():
     dt = request.args.get('date').split("/")  # also accepted in URL, but defaults to 1
     curdate = datetime(int(dt[2].replace("\"", "")), int(dt[0]), int(dt[1].replace("\"", "")))
     end = curdate + timedelta(hours=23, minutes=59, seconds=59)
-    longs, lats, tripStartTimes, tripEndTimes, dist, totalTime, stamps = trajectoryClean(g.dbc, imei, 0.08, int(dt[2].replace("\"", "")), int(dt[0].replace("\"", "")), int(dt[1]))
-    return json.dumps({"lats": lats, "longs": longs, "start": tripStartTimes, "end": tripEndTimes, "d": dist, "ttime": totalTime, "stamps": stamps})
+    longs, lats, tripStartTimes, tripEndTimes, dist, totalTime, stamps = trajectoryClean(g.dbc, imei, 0.08,
+                                                                                         int(dt[2].replace("\"", "")),
+                                                                                         int(dt[0].replace("\"", "")),
+                                                                                         int(dt[1]))
+    return json.dumps(
+        {"lats": lats, "longs": longs, "start": tripStartTimes, "end": tripEndTimes, "d": dist, "ttime": totalTime,
+         "stamps": stamps})
 
 
 ########### NEW APIs ###########
@@ -225,7 +240,8 @@ def tripLengthDistribution():
     imei = request.args.get('imei')
     dt = request.args.get('s').split("/")
     numdays = int(request.args.get('nd'))
-    ret = getTripLengthDistribution(g.dbc, imei, int(dt[0].replace("\"", "")), int(dt[1]), int(dt[2].replace("\"", "")), numdays)
+    ret = getTripLengthDistribution(g.dbc, imei, int(dt[0].replace("\"", "")), int(dt[1]), int(dt[2].replace("\"", "")),
+                                    numdays)
     return Response(json.dumps(ret), mimetype='application/json')
 
 
@@ -236,8 +252,13 @@ def tripCoords():
     dt = request.args.get('date').split("/")  # also accepted in URL, but defaults to 1
     curdate = datetime(int(dt[2].replace("\"", "")), int(dt[0]), int(dt[1].replace("\"", "")))
     end = curdate + timedelta(hours=23, minutes=59, seconds=59)
-    longs, lats, tripStartTimes, tripEndTimes, dist, totalTime, stamps, ids, isAccurateList, comments = trajectoryClean(g.dbc, imei, 0.04, int(dt[2].replace("\"", "")), int(dt[0].replace("\"", "")), int(dt[1]))
-    return Response(json.dumps({"lats": lats, "longs": longs, "start": tripStartTimes, "end": tripEndTimes, "d": dist, "ttime": totalTime, "stamps": stamps, "isAccurate": isAccurateList, "comments":comments, "tripIDs": ids}), mimetype='application/json')
+    longs, lats, tripStartTimes, tripEndTimes, dist, totalTime, stamps, ids, isAccurateList, comments = trajectoryClean(
+        g.dbc, imei, 0.04, int(dt[2].replace("\"", "")), int(dt[0].replace("\"", "")), int(dt[1]))
+    return Response(json.dumps(
+        {"lats": lats, "longs": longs, "start": tripStartTimes, "end": tripEndTimes, "d": dist, "ttime": totalTime,
+         "stamps": stamps, "isAccurate": isAccurateList, "comments": comments, "tripIDs": ids}),
+        mimetype='application/json')
+
 
 @app.route('/updateTripComments', methods=['POST'])
 @login_required
@@ -253,6 +274,7 @@ def updateTripComments():
 
     return Response(json.dumps({"imei": imei}))
 
+
 @app.route('/socEstimation', methods=['GET'])
 @login_required
 def socEstimation():
@@ -261,9 +283,11 @@ def socEstimation():
     ret = getSOCEstimation(g.dbc, imei, int(dt[0].replace("\"", "")), int(dt[1]), int(dt[2].replace("\"", "")))
     return Response(json.dumps(ret), mimetype='application/json')
 
+
 @app.route('/visualStatus', methods=['GET'])
 def visualStatus():
-    return Response(json.dumps({"test",1}), mimetype='application/json')
+    return Response(json.dumps({"test", 1}), mimetype='application/json')
+
 
 ########### END of NEW APIs ###########
 

@@ -1,5 +1,6 @@
 from flask.ext.security import UserMixin
 
+
 class User(UserMixin):
     def __init__(self, imei, name, password, id, active=True):
         self.imei = imei
@@ -7,6 +8,6 @@ class User(UserMixin):
         self.password = password
         self.id = id
         self.active = active
-        
+
     def is_active(self):
         return self.active

@@ -1,5 +1,4 @@
 class Parameter:
-
     def __init__(self, length, min_value, min_number_values_over_limit):
         # Length of array of data
         self.length = length
