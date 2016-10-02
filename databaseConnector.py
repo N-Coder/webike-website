@@ -1,18 +1,20 @@
-from __future__ import division 
+from __future__ import division
+
 import pymysql as MySQLdb
+
 
 #only need one instance of this connector to manage all database calls
 class databaseConnector(object):
     def __init__(self, app):
         try:    
             #now go open that conf file and get the username and password
-            for line in open(app.config["DB_CREDENTIALS_PATH"]).readlines():
-                items = line.split(" := ")
-                if items[0].strip() == "passwd":
-                    p = items[1].strip().split("\"")[1].split("\"")[0]
-                if items[0].strip() == "user":
-                    usr = items[1].strip() 
-            self.myDB = MySQLdb.connect(host=app.config["DB_HOST"], port=3306, user=usr,passwd='{0}'.format(p), db=app.config["DB_NAME"])
+            self.myDB = MySQLdb.connect(
+                host=app.config["DB_HOST"],
+                port=app.config["DB_PORT"],
+                user=app.config["DB_USER"],
+                passwd=app.config["DB_PASSWD"],
+                db=app.config["DB_NAME"]
+            )
             #http://legacy.python.org/dev/peps/pep-0249/#id7
             self.cur = self.myDB.cursor() 
         except MySQLdb.Error as msg:

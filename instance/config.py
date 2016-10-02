@@ -1,8 +1,16 @@
 DEBUG = True
-HOSTNAME = "blizzard.cs.uwaterloo.ca"
+
+# Server
+HOSTNAME = "localhost"
 PORT = 5000
-DB_HOST = "typhoon.cs.uwaterloo.ca"
+
+# Database
+DB_HOST = "localhost"
 DB_PORT = 3306
 DB_NAME = "webike"
-DB_CREDENTIALS_PATH = "/u2/tcarpenter/webikewebsite/blizzard/dbcredentials.txt"
+DB_USER = "root"
+DB_PASSWD = "elefant"
+
+# URLs
 ASSETS_PATH = "/~sensordc/bootstrap"
+AJAX_URL_EXT = "/webike"

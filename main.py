@@ -1,25 +1,22 @@
-from flask import Flask, request, Response, flash, redirect, url_for
-from flask import render_template
-from flask.ext.security import login_required, login_user
-from flask.ext.login import (LoginManager, current_user, login_required,
-                             login_user, logout_user, UserMixin, confirm_login, fresh_login_required)
-#!/usr/bin/env python2
-from datetime import datetime, timedelta
-from databaseConnector import *
-from grapher import *
 import builtins
 import hashlib
-from User import User
-from compute import detectTrips
 import json
 
-from flask import g, Blueprint
+from flask import Flask, request, Response, flash, redirect, url_for
+from flask import g
+from flask import render_template
+from flask.ext.login import (LoginManager, current_user, login_required,
+                             login_user, logout_user)
+from flask.ext.security import login_user
+
+from User import User
+from databaseConnector import *
+from grapher import *
 from trajectory import trajectoryClean
 
 builtins.unicode = str
 
 app = Flask(__name__, instance_relative_config=True)
-app.config.from_object('config')
 app.config.from_pyfile('config.py')
 
 SECRET_KEY = "yeah, not actually a secret"
