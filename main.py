@@ -3,6 +3,7 @@ import hashlib
 
 from flask import Flask, request, Response, flash, redirect, url_for
 from flask import g
+from flask import json
 from flask import render_template
 from flask.ext.login import (LoginManager, current_user, login_required,
                              login_user, logout_user)
@@ -12,6 +13,7 @@ from User import User
 from databaseConnector import *
 from grapher import *
 from trajectory import trajectoryClean
+from visualStatus import load_status
 
 builtins.unicode = str
 
@@ -286,7 +288,7 @@ def socEstimation():
 
 @app.route('/visualStatus', methods=['GET'])
 def visualStatus():
-    return Response(json.dumps({"test", 1}), mimetype='application/json')
+    return Response(json.dumps(load_status()), mimetype='application/json')
 
 
 ########### END of NEW APIs ###########
