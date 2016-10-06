@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html ng-app="visual_status">
+<head>
+    <title>Visual Status</title>
+    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/angularjs/1.4.2/angular.min.js"></script>
+    <script type="text/javascript" src="./main.js"></script>
+    <style type="text/css">
+        .sortorder:after {
+            content: '\25b2';
+        }
+
+        .sortorder.reverse:after {
+            content: '\25bc';
+        }
+
+        table, th, td {
+            border: 1px solid grey;
+            border-collapse: collapse;
+            padding: 5px;
+        }
+
+        table tr:nth-child(odd) {
+            background-color: #f1f1f1;
+        }
+
+        table tr:nth-child(even) {
+            background-color: #ffffff;
+        }
+
+        .description {
+            position: absolute;
+            border: 2px solid #000;
+            background-color: rgba(256, 256, 256, 0.9);
+            width: 100px;
+            height: 80px;
+        }
+    </style>
+</head>
+<body ng-controller="MainController">
+<table class="WeBikes">
+    <tr>
+        <th>
+            <a ng-click="order('IMEI')">IMEI</a>
+            <span class="sortorder" ng-show="OrderedBy === 'IMEI'" ng-class="{reverse:reverse}"></span>
+        </th>
+        <th>
+            <a ng-click="order('sensor')">Sensor ID</a>
+            <span class="sortorder" ng-show="OrderedBy === 'sensor'" ng-class="{reverse:reverse}"></span>
+        </th>
+        <th>
+            <a ng-click="order('last_seen')">Last Seen</a>
+            <span class="sortorder" ng-show="OrderedBy === 'last_seen'" ng-class="{reverse:reverse}"></span>
+        </th>
+        <th>
+            <a ng-click="order('voltage')">Voltage</a>
+            <span class="sortorder" ng-show="OrderedBy === 'voltage'" ng-class="{reverse:reverse}"></span>
+        </th>
+        <th>
+            <a ng-click="order('version')">Version</a>
+            <span class="sortorder" ng-show="OrderedBy === 'version'" ng-class="{reverse:reverse}"></span>
+        </th>
+        <th>
+            <a ng-click="order('phone_battery')">Phone Battery</a>
+            <span class="sortorder" ng-show="OrderedBy === 'phone_battery'" ng-class="{reverse:reverse}"></span>
+        </th>
+        <th>
+            <a ng-click="order('LatGPS')">Lat GPS</a>
+            <span class="sortorder" ng-show="OrderedBy === 'LatGPS'" ng-class="{reverse:reverse}"></span>
+        </th>
+        <th>
+            <a ng-click="order('LongGPS')">Long GPS</a>
+            <span class="sortorder" ng-show="OrderedBy === 'LongGPS'" ng-class="{reverse:reverse}"></span>
+        </th>
+        <th>
+            <a ng-click="order('DischargeCurr')">DischargeCurr</a>
+            <span class="sortorder" ng-show="OrderedBy === 'DischargeCurr'" ng-class="{reverse:reverse}"></span>
+        </th>
+    </tr>
+    <tr ng-repeat="bike in WeBikes | orderBy:OrderedBy:reverse">
+        <td>{{ bike.IMEI }}</td>
+        <td>{{ bike.sensor }}</td>
+        <td class="last_seen">{{ bike.last_seen }}</td>
+        <td>{{ bike.voltage }}</td>
+        <td>{{ bike.version }}</td>
+        <td class="phone_battery">{{ bike.phone_battery }}</td>
+        <td>{{ bike.LatGPS }}</td>
+        <td>{{ bike.LongGPS }}</td>
+        <td>{{ bike.DischargeCurr }}</td>
+    </tr>
+</table>
+</body>
+</html>

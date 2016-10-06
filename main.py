@@ -1,3 +1,5 @@
+# /usr/bin/python3
+
 import builtins
 import hashlib
 
@@ -286,7 +288,7 @@ def socEstimation():
     return Response(json.dumps(ret), mimetype='application/json')
 
 
-@app.route('/visualStatus', methods=['GET'])
+@app.route('/visual_status/api', methods=['GET'])
 def visualStatus():
     return Response(json.dumps(load_status()), mimetype='application/json')
 

@@ -1,4 +1,3 @@
-# /usr/bin/python3
 import copy
 
 from flask import g
@@ -42,7 +41,7 @@ BIKES = [
 def load_status():
     bike_status = copy.deepcopy(BIKES)
 
-    # the databaseConnector implementation is really broken,
+    # the databaseConnector implementation is really broken (and obsolete),
     # so just grab the underlying connection and use a proper cursor
     with g.dbc.myDB.cursor(DictCursor) as cur:
         for bike in bike_status:
