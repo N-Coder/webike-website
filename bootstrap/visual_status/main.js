@@ -28,23 +28,10 @@
                 window.onload = function () {
                     $http.get("api").success(function (data) {
                         $scope.WeBikes = data;
-                        var phone_batteries = document.getElementsByClassName('phone_battery');
-                        for (i = 0; i < phone_batteries.length; i++) {
-                            if (phone_batteries[i].innerText <= 20) {
-                                phone_batteries[i].style.color = "red";
-                                phone_batteries[i].style.background = "pink"
-                            }
-                        }
-                        var last_seen = document.getElementsByClassName('last_seen');
-                        for (i = 0; i < last_seen.length; i++) {
-                            if (last_seen[i].innerText <= daysAgo(60)) {
-                                last_seen[i].style.background = "pink"
-                            } else if (last_seen[i].innerText <= daysAgo(30)) {
-                                last_seen[i].style.background = "yellow"
-                            } else if (last_seen[i].innerText >= daysAgo(7)) {
-                                last_seen[i].style.background = "green"
-                            }
-                        }
+                        var today = new Date();
+                        $scope.WeBikes.forEach(function (bike) {
+                            bike.last_seen_ago = Math.round((today - new Date(bike.last_seen)) / 86400000);
+                        });
                     })
                 }
             }]);

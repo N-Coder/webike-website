@@ -34,6 +34,27 @@
             width: 100px;
             height: 80px;
         }
+
+        .phone_battery_empty {
+            color: red;
+            background: pink;
+        }
+
+        .last_seen_long {
+            background: red;
+        }
+
+        .last_seen_med {
+            background: orange;
+        }
+
+        .last_seen_short {
+            background: yellow;
+        }
+
+        .last_seen_recent {
+            background: green;
+        }
     </style>
 </head>
 <body ng-controller="MainController">
@@ -79,10 +100,15 @@
     <tr ng-repeat="bike in WeBikes | orderBy:OrderedBy:reverse">
         <td>{{ bike.IMEI }}</td>
         <td>{{ bike.sensor }}</td>
-        <td class="last_seen">{{ bike.last_seen }}</td>
+        <td class="last_seen" ng-class="{
+                last_seen_long: bike.last_seen_ago > 60,
+                last_seen_med: bike.last_seen_ago <= 60 && bike.last_seen_ago > 30,
+                last_seen_short: bike.last_seen_ago <= 30 && bike.last_seen_ago > 7,
+                last_seen_recent: bike.last_seen_ago <= 7}">{{ bike.last_seen }}</td>
         <td>{{ bike.voltage }}</td>
         <td>{{ bike.version }}</td>
-        <td class="phone_battery">{{ bike.phone_battery }}</td>
+        <td class="phone_battery"
+            ng-class="{phone_battery_empty: bike.phone_battery <= 20}">{{ bike.phone_battery }}</td>
         <td>{{ bike.LatGPS }}</td>
         <td>{{ bike.LongGPS }}</td>
         <td>{{ bike.DischargeCurr }}</td>
