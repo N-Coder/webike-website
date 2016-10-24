@@ -26,7 +26,7 @@
                     )[0].comment = cmt
                 };
                 window.onload = function () {
-                    $http.get("api").success(function (data) {
+                    $http.get("/webike/visual_status/api").success(function (data) {
                         $scope.WeBikes = data;
                         var today = new Date();
                         $scope.WeBikes.forEach(function (bike) {

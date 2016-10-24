@@ -45,7 +45,9 @@ def db_connect():
 
 @app.teardown_request
 def db_disconnect(exception=None):
-    g.dbc.shutDown()
+    if "dbc" in g and g.dbc:
+        g.dbc.shutDown()
+        g.dbc = None
 
 
 @login_manager.user_loader

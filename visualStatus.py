@@ -52,7 +52,8 @@ def load_status():
             bike["last_seen"] = str(row['Stamp'])
             bike["voltage"] = row['BatteryVoltage']
             bike["version"] = row['CodeVersion']
-            bike["phone_battery"] = float(row['PhoneBattState'].split(":")[3]) * 100 if row['PhoneBattState'] else 0
+            if row['PhoneBattState'] and row['PhoneBattState'] != 'NULL':
+                bike["phone_battery"] = float(row['PhoneBattState'].split(":")[3]) * 100 if row['PhoneBattState'] else 0
             bike["LatGPS"] = row['LatGPS'] or row['LatNetwork']
             bike["LongGPS"] = row['LongGPS'] or row['LongNetwork']
             bike["DischargeCurr"] = row['DischargeCurr']
