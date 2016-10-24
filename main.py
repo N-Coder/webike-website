@@ -292,7 +292,10 @@ def socEstimation():
 
 @app.route('/visual_status/api', methods=['GET'])
 def visualStatus():
-    return Response(json.dumps(load_status()), mimetype='application/json')
+    #auth = request.authorization
+    #if not auth or auth.password != "secret":
+    return Response('Login required', 401, {'WWW-Authenticate': 'Basic realm="Login Required"'})
+    #return Response(json.dumps(load_status()), mimetype='application/json')
 
 
 ########### END of NEW APIs ###########
