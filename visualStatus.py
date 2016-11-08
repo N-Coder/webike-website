@@ -38,16 +38,19 @@ BIKES = [
 ]
 
 
-def load_status():
+def load_status(date=None):
     bike_status = copy.deepcopy(BIKES)
 
     # the databaseConnector implementation is really broken (and obsolete),
     # so just grab the underlying connection and use a proper cursor
     with g.dbc.myDB.cursor(DictCursor) as cur:
         for bike in bike_status:
-            cur.execute(
-                "SELECT * FROM imei{} WHERE CodeVersion > 0 ORDER BY Stamp DESC LIMIT 1;".format(bike["IMEI"])
-            )
+            if date:
+                cur.execute("SELECT * FROM imei{} WHERE CodeVersion > 0 AND Stamp <= %s ORDER BY Stamp DESC LIMIT 1;"
+                            .format(bike["IMEI"]), date)
+            else:
+                cur.execute("SELECT * FROM imei{} WHERE CodeVersion > 0 ORDER BY Stamp DESC LIMIT 1;"
+                            .format(bike["IMEI"]))
             row = cur.fetchone()
             bike["last_seen"] = str(row['Stamp'])
             bike["voltage"] = row['BatteryVoltage']
